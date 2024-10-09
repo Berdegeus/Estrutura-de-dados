@@ -1,15 +1,15 @@
 /**
  * Classe que representa um nó na árvore binária do código Morse.
  */
-public class Nodo {
+public class No {
     char caractere; // Caractere armazenado no nó
-    Nodo filhoEsquerdo; // Representa '.'
-    Nodo filhoDireito;  // Representa '-'
+    No filhoEsquerdo; // Representa '.'
+    No filhoDireito;  // Representa '-'
 
     /**
      * Construtor para criar um nó vazio.
      */
-    public Nodo() {
+    public No() {
         this.caractere = '\0';
         this.filhoEsquerdo = null;
         this.filhoDireito = null;
@@ -19,7 +19,7 @@ public class Nodo {
      * Construtor para criar um nó com um caractere.
      * @param caractere O caractere a ser armazenado no nó.
      */
-    public Nodo(char caractere) {
+    public No(char caractere) {
         this.caractere = caractere;
         this.filhoEsquerdo = null;
         this.filhoDireito = null;

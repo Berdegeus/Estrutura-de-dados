@@ -5,7 +5,7 @@ import java.util.Map;
  * Classe que representa a árvore binária do código Morse.
  */
 public class ArvoreBinariaMorse {
-    private Nodo raiz;
+    private No raiz;
     private Map<Character, String> mapaCharParaMorse;
     private Map<String, Character> mapaMorseParaChar;
 
@@ -13,7 +13,7 @@ public class ArvoreBinariaMorse {
      * Construtor que inicializa a árvore do código Morse.
      */
     public ArvoreBinariaMorse() {
-        raiz = new Nodo();
+        raiz = new No();
         mapaCharParaMorse = new HashMap<>();
         mapaMorseParaChar = new HashMap<>();
         inicializarMapasMorse();
@@ -85,17 +85,17 @@ public class ArvoreBinariaMorse {
      * @param caractere O caractere a ser inserido.
      */
     public void inserir(String codigoMorse, char caractere) {
-        Nodo nodoAtual = raiz;
+        No nodoAtual = raiz;
         for (int i = 0; i < codigoMorse.length(); i++) {
             char simbolo = codigoMorse.charAt(i);
             if (simbolo == '.') {
                 if (nodoAtual.filhoEsquerdo == null) {
-                    nodoAtual.filhoEsquerdo = new Nodo();
+                    nodoAtual.filhoEsquerdo = new No();
                 }
                 nodoAtual = nodoAtual.filhoEsquerdo;
             } else if (simbolo == '-') {
                 if (nodoAtual.filhoDireito == null) {
-                    nodoAtual.filhoDireito = new Nodo();
+                    nodoAtual.filhoDireito = new No();
                 }
                 nodoAtual = nodoAtual.filhoDireito;
             } else {
@@ -111,7 +111,7 @@ public class ArvoreBinariaMorse {
      * @return O caractere correspondente ou '\0' se não encontrado.
      */
     public char buscar(String codigoMorse) {
-        Nodo nodoAtual = raiz;
+        No nodoAtual = raiz;
         for (int i = 0; i < codigoMorse.length(); i++) {
             if (nodoAtual == null) {
                 return '\0';
@@ -144,7 +144,7 @@ public class ArvoreBinariaMorse {
      * @param nodo O nodo atual.
      * @param indentacao A indentação para representar a hierarquia.
      */
-    private void exibirArvoreHelper(Nodo nodo, String indentacao) {
+    private void exibirArvoreHelper(No nodo, String indentacao) {
         if (nodo != null) {
             System.out.println(indentacao + (nodo.caractere != '\0' ? nodo.caractere : "*"));
             exibirArvoreHelper(nodo.filhoEsquerdo, indentacao + " .");
