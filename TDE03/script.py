@@ -1,65 +1,47 @@
-import os
 import pandas as pd
+import matplotlib.pyplot as plt
 
-def carregar_dados(path):
-    dados = []
-    for pasta in sorted(os.listdir(path)):
-        pasta_path = os.path.join(path, pasta)
-        if os.path.isdir(pasta_path):
-            run_dados = {}
-            for arquivo in os.listdir(pasta_path):
-                if arquivo.endswith(".csv"):
-                    algoritmo = arquivo.split('_')[0]
-                    tamanho = arquivo.split('_')[1].replace('.csv', '')
-                    csv_path = os.path.join(pasta_path, arquivo)
-                    df = pd.read_csv(csv_path)
-                    run_dados[(algoritmo, tamanho)] = df
-            dados.append(run_dados)
-    return dados
+# Carrega os dados do arquivo resumo_medias.csv
+df = pd.read_csv('resumo_medias.csv')
 
-def calcular_medias(dados):
-    medias = {}
-    for run in dados:
-        for key, df in run.items():
-            algoritmo, tamanho = key
-            if key not in medias:
-                medias[key] = {'Tempo(ms)': [], 'Trocas': [], 'Iteracoes': []}
-            medias[key]['Tempo(ms)'].append(df['Tempo(ms)'].mean())
-            medias[key]['Trocas'].append(df['Trocas'].mean())
-            medias[key]['Iteracoes'].append(df['Iteracoes'].mean())
-    return medias
+# Converte a coluna 'Tamanho' para int
+df['Tamanho'] = df['Tamanho'].astype(int)
 
-def gerar_tabelas(dados, medias):
-    # Tabela com todos os valores
-    todas_execucoes = []
-    for run_id, run in enumerate(dados):
-        for key, df in run.items():
-            algoritmo, tamanho = key
-            for index, row in df.iterrows():
-                todas_execucoes.append([run_id + 1, algoritmo, tamanho, row['Tempo(ms)'], row['Trocas'], row['Iteracoes']])
+# Remove as entradas do GnomeSort com valores negativos ou inválidos
+df = df[~((df['Algoritmo'] == 'GnomeSort') & (df['Trocas Médias'] < 0))]
 
-    df_todas_execucoes = pd.DataFrame(todas_execucoes, columns=['Run', 'Algoritmo', 'Tamanho', 'Tempo(ms)', 'Trocas', 'Iteracoes'])
-    print(df_todas_execucoes)
-    df_todas_execucoes.to_csv("todas_execucoes.csv", index=False)
+# Agrupa os dados por Algoritmo e Tamanho, calculando a média dos valores
+df_grouped = df.groupby(['Algoritmo', 'Tamanho']).mean().reset_index()
 
-    # Tabela de médias
-    linhas_medias = []
-    for key, valores in medias.items():
-        algoritmo, tamanho = key
-        tempo_medio = sum(valores['Tempo(ms)']) / len(valores['Tempo(ms)'])
-        trocas_media = sum(valores['Trocas']) / len(valores['Trocas'])
-        iteracoes_media = sum(valores['Iteracoes']) / len(valores['Iteracoes'])
-        linhas_medias.append([algoritmo, tamanho, tempo_medio, trocas_media, iteracoes_media])
+# Lista dos algoritmos para plotagem
+algoritmos = df_grouped['Algoritmo'].unique()
 
-    df_medias = pd.DataFrame(linhas_medias, columns=['Algoritmo', 'Tamanho', 'Tempo(ms) Médio', 'Trocas Médias', 'Iterações Médias'])
-    print(df_medias)
-    df_medias.to_csv("resumo_medias.csv", index=False)
+# Gráfico de Tempo Médio de Execução
+plt.figure(figsize=(10,6))
+for algoritmo in algoritmos:
+    df_alg = df_grouped[df_grouped['Algoritmo'] == algoritmo].sort_values(by='Tamanho')
+    plt.plot(df_alg['Tamanho'], df_alg['Tempo(ms) Médio'], marker='o', label=algoritmo)
+plt.xlabel('Tamanho do Vetor')
+plt.ylabel('Tempo Médio de Execução (ms)')
+plt.title('Tempo Médio de Execução em Função do Tamanho do Vetor')
+plt.legend()
+plt.grid(True, which="both", ls="--")
+plt.xscale('log')
+plt.yscale('log')
+plt.savefig('grafico_tempo.png')
+plt.show()
 
-def main():
-    path = os.getcwd()  # Diretório atual onde as pastas Run estão localizadas
-    dados = carregar_dados(path)
-    medias = calcular_medias(dados)
-    gerar_tabelas(dados, medias)
-
-if __name__ == "__main__":
-    main()
+# Gráfico de Número Médio de Trocas
+plt.figure(figsize=(10,6))
+for algoritmo in algoritmos:
+    df_alg = df_grouped[df_grouped['Algoritmo'] == algoritmo].sort_values(by='Tamanho')
+    plt.plot(df_alg['Tamanho'], df_alg['Trocas Médias'], marker='o', label=algoritmo)
+plt.xlabel('Tamanho do Vetor')
+plt.ylabel('Número Médio de Trocas')
+plt.title('Número Médio de Trocas em Função do Tamanho do Vetor')
+plt.legend()
+plt.grid(True, which="both", ls="--")
+plt.xscale('log')
+plt.yscale('log')
+plt.savefig('grafico_trocas.png')
+plt.show()
