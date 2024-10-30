@@ -1,5 +1,13 @@
 public class MergeSort {
 
+    private int trocas;
+    private int iteracoes;
+
+    public MergeSort() {
+        this.trocas = 0;
+        this.iteracoes = 0;
+    }
+
     public void ordenar(int[] array, int tamanho) {
         if (tamanho > 1) {
             int meio = tamanho / 2;
@@ -19,6 +27,7 @@ public class MergeSort {
     private void copiarArray(int[] origem, int[] destino, int inicio, int tamanho) {
         for (int i = 0; i < tamanho; i++) {
             destino[i] = origem[inicio + i];
+            iteracoes++;
         }
     }
 
@@ -29,13 +38,25 @@ public class MergeSort {
                 array[k++] = esquerda[i++];
             } else {
                 array[k++] = direita[j++];
+                trocas++;
             }
+            iteracoes++;
         }
         while (i < tamanhoEsquerda) {
             array[k++] = esquerda[i++];
+            iteracoes++;
         }
         while (j < tamanhoDireita) {
             array[k++] = direita[j++];
+            iteracoes++;
         }
+    }
+
+    public int getTrocas() {
+        return trocas;
+    }
+
+    public int getIteracoes() {
+        return iteracoes;
     }
 }

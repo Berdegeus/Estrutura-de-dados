@@ -5,53 +5,55 @@ import java.io.IOException;
 public class TesteOrdenacao {
 
     public static void main(String[] args) {
-        for (int i = 0; i < 5; i++) { // 5 tamanhos: 1000, 10000, 100000, 500000, 1000000
-            int[] dados = GeradorDados.gerarDadosPorTamanho(i);
+        int[] tamanhos = {1000, 10000, 100000, 500000, 1000000};
 
-            testarBogoSort(dados.clone(), i);
-            testarMergeSort(dados.clone(), i);
-            testarQuickSort(dados.clone(), i);
-            testarGnomeSort(dados.clone(), i);
+        for (int tamanho : tamanhos) {
+            int[] dados = new int[tamanho];
+            GeradorDados.gerarDados(dados, tamanho);
+
+            testarCombSort(dados.clone(), tamanho);
+            testarMergeSort(dados.clone(), tamanho);
+            testarQuickSort(dados.clone(), tamanho);
+            testarGnomeSort(dados.clone(), tamanho);
         }
     }
 
-    private static void testarBogoSort(int[] dados, int tamanhoIndex) {
-        BogoSort bogoSort = new BogoSort();
+    private static void testarCombSort(int[] dados, int tamanho) {
+        CombSort combSort = new CombSort();
         long inicio = System.nanoTime();
-        bogoSort.ordenar(dados, dados.length); // Passando tamanho do array
+        combSort.ordenar(dados, tamanho);
         long fim = System.nanoTime();
-        salvarCSV("BogoSort", tamanhoIndex, (fim - inicio) / 1000000);
+        salvarCSV("CombSort", tamanho, (fim - inicio) / 1000000, combSort.getTrocas(), combSort.getIteracoes());
     }
 
-    private static void testarMergeSort(int[] dados, int tamanhoIndex) {
+    private static void testarMergeSort(int[] dados, int tamanho) {
         MergeSort mergeSort = new MergeSort();
         long inicio = System.nanoTime();
-        mergeSort.ordenar(dados, dados.length); // Passando tamanho do array
+        mergeSort.ordenar(dados, tamanho);
         long fim = System.nanoTime();
-        salvarCSV("MergeSort", tamanhoIndex, (fim - inicio) / 1000000);
+        salvarCSV("MergeSort", tamanho, (fim - inicio) / 1000000, mergeSort.getTrocas(), mergeSort.getIteracoes());
     }
 
-    private static void testarQuickSort(int[] dados, int tamanhoIndex) {
+    private static void testarQuickSort(int[] dados, int tamanho) {
         QuickSort quickSort = new QuickSort();
         long inicio = System.nanoTime();
-        quickSort.ordenar(dados, 0, dados.length - 1);
+        quickSort.ordenar(dados, 0, tamanho - 1);
         long fim = System.nanoTime();
-        salvarCSV("QuickSort", tamanhoIndex, (fim - inicio) / 1000000);
+        salvarCSV("QuickSort", tamanho, (fim - inicio) / 1000000, quickSort.getTrocas(), quickSort.getIteracoes());
     }
 
-    private static void testarGnomeSort(int[] dados, int tamanhoIndex) {
+    private static void testarGnomeSort(int[] dados, int tamanho) {
         GnomeSort gnomeSort = new GnomeSort();
         long inicio = System.nanoTime();
-        gnomeSort.ordenar(dados, dados.length); // Passando tamanho do array
+        gnomeSort.ordenar(dados, tamanho);
         long fim = System.nanoTime();
-        salvarCSV("GnomeSort", tamanhoIndex, (fim - inicio) / 1000000);
+        salvarCSV("GnomeSort", tamanho, (fim - inicio) / 1000000, gnomeSort.getTrocas(), gnomeSort.getIteracoes());
     }
 
-    private static void salvarCSV(String algoritmo, int tamanhoIndex, long tempo) {
-        String[] tamanhos = {"1000", "10000", "100000", "500000", "1000000"};
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(algoritmo + "_" + tamanhos[tamanhoIndex] + ".csv", true))) {
-            writer.write("Tamanho,Tempo(ms)\n");
-            writer.write(tamanhos[tamanhoIndex] + "," + tempo + "\n");
+    private static void salvarCSV(String algoritmo, int tamanho, long tempo, int trocas, int iteracoes) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(algoritmo + "_" + tamanho + ".csv", true))) {
+            writer.write("Tamanho,Tempo(ms),Trocas,Iteracoes\n");
+            writer.write(tamanho + "," + tempo + "," + trocas + "," + iteracoes + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }

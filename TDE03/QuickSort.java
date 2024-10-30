@@ -1,5 +1,13 @@
 public class QuickSort {
 
+    private int trocas;
+    private int iteracoes;
+
+    public QuickSort() {
+        this.trocas = 0;
+        this.iteracoes = 0;
+    }
+
     public void ordenar(int[] array, int inicio, int fim) {
         if (inicio < fim) {
             int pivoIndex = particionar(array, inicio, fim);
@@ -16,6 +24,7 @@ public class QuickSort {
                 i++;
                 trocar(array, i, j);
             }
+            iteracoes++;
         }
         trocar(array, i + 1, fim);
         return i + 1;
@@ -25,5 +34,14 @@ public class QuickSort {
         int temp = array[i];
         array[i] = array[j];
         array[j] = temp;
+        trocas++;
+    }
+
+    public int getTrocas() {
+        return trocas;
+    }
+
+    public int getIteracoes() {
+        return iteracoes;
     }
 }
