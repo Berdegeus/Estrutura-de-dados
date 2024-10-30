@@ -56,13 +56,13 @@ public class TabelaHash {
 
         @Override
         public int hash(long chave) {
-            String strChave = Long.toString(chave);
             int soma = 0;
             int n = 2; // Número de dígitos por grupo
-
-            for (int i = 0; i < strChave.length(); i += n) {
-                String parte = strChave.substring(i, Math.min(i + n, strChave.length()));
-                soma += Integer.parseInt(parte);
+            long num = chave;
+            while (num > 0) {
+                int parte = (int) (num % 100); // Obtém os últimos 2 dígitos
+                soma += parte;
+                num /= 100; // Remove os últimos 2 dígitos
             }
             return soma % tamanho;
         }
@@ -124,33 +124,37 @@ public class TabelaHash {
     public static void main(String[] args) {
         // Tamanhos da tabela hash
         int[] tamanhosTabela = {1000, 10000, 100000};
+        int len_tamanhosTabela = 3;
 
         // Tamanhos dos conjuntos de dados
-        int[] tamanhosDados = {1000000, 5000000, 20000000};
+        int[] tamanhosDados = {100000, 500000, 2000000};
+        int len_tamanhosDados = 3;
 
         // Geração dos conjuntos de dados com seed fixa
-        Registro[][] conjuntosDados = gerarConjuntosDados(tamanhosDados);
+        Registro[][] conjuntosDados = gerarConjuntosDados(tamanhosDados, len_tamanhosDados);
 
         // Para cada tamanho de tabela
-        for (int tamanhoTabela : tamanhosTabela) {
+        for (int t = 0; t < len_tamanhosTabela; t++) {
+            int tamanhoTabela = tamanhosTabela[t];
             System.out.println("Tamanho da Tabela: " + tamanhoTabela);
 
             // Para cada função hash
             FuncaoHash[] funcoesHash = {
-                new HashDivisao(tamanhoTabela),
-                new HashMultiplicacao(tamanhoTabela),
-                new HashDobramento(tamanhoTabela)
+                    new HashDivisao(tamanhoTabela),
+                    new HashMultiplicacao(tamanhoTabela),
+                    new HashDobramento(tamanhoTabela)
             };
 
             String[] nomesFuncoesHash = {"Divisão", "Multiplicação", "Dobramento"};
+            int len_funcoesHash = 3;
 
-            for (int f = 0; f < funcoesHash.length; f++) {
+            for (int f = 0; f < len_funcoesHash; f++) {
                 FuncaoHash funcaoHash = funcoesHash[f];
                 String nomeFuncaoHash = nomesFuncoesHash[f];
                 System.out.println("Função Hash: " + nomeFuncaoHash);
 
                 // Para cada conjunto de dados
-                for (int i = 0; i < tamanhosDados.length; i++) {
+                for (int i = 0; i < len_tamanhosDados; i++) {
                     int tamanhoDados = tamanhosDados[i];
                     Registro[] dados = conjuntosDados[i];
                     System.out.println("Tamanho do Conjunto de Dados: " + tamanhoDados);
@@ -160,7 +164,8 @@ public class TabelaHash {
 
                     // Inserção dos elementos
                     long inicioInsercao = System.currentTimeMillis();
-                    for (Registro reg : dados) {
+                    for (int k = 0; k < tamanhoDados; k++) {
+                        Registro reg = dados[k];
                         tabelaHash.inserir(reg);
                     }
                     long fimInsercao = System.currentTimeMillis();
@@ -203,9 +208,9 @@ public class TabelaHash {
     }
 
     // Método para gerar conjuntos de dados com seed fixa
-    static Registro[][] gerarConjuntosDados(int[] tamanhosDados) {
-        Registro[][] conjuntos = new Registro[tamanhosDados.length][];
-        for (int i = 0; i < tamanhosDados.length; i++) {
+    static Registro[][] gerarConjuntosDados(int[] tamanhosDados, int len_tamanhosDados) {
+        Registro[][] conjuntos = new Registro[len_tamanhosDados][];
+        for (int i = 0; i < len_tamanhosDados; i++) {
             int tamanho = tamanhosDados[i];
             conjuntos[i] = new Registro[tamanho];
             Random rand = new Random(42); // Seed fixa para reprodutibilidade
