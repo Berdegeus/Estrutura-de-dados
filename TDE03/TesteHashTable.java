@@ -1,3 +1,4 @@
+import java.util.Random;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -8,22 +9,25 @@ public class TesteHashTable {
         int[] tamanhosTabelas = {1000, 10000, 100000};  // Tamanhos diferentes para a tabela hash
         int[] tamanhosDados = {1000000, 5000000, 20000000}; // Conjuntos de dados
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("resultados.csv"))) {
-            writer.write("Tamanho Tabela,Conjunto de Dados,Função Hash,Tempo Inserção (ms),Colisões,Tempo Busca (ms),Comparações\n");
+        for (int tamanhoTabela : tamanhosTabelas) {
+            for (int tamanhoDados : tamanhosDados) {
+                String[] dados = GeradorDados.gerarDados(tamanhoDados);
 
-            for (int tamanhoTabela : tamanhosTabelas) {
-                for (int tamanhoDados : tamanhosDados) {
-                    String[] dados = GeradorDados.gerarDados(tamanhoDados);
+                String nomeArquivo = "resultados_" + tamanhoTabela + "_" + tamanhoDados + ".csv";
+
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(nomeArquivo))) {
+                    writer.write("Tamanho Tabela,Conjunto de Dados,Função Hash,Tempo Inserção (ms),Colisões,Tempo Busca (ms),Comparações\n");
 
                     // Testar para cada função hash
                     testarTabela(tamanhoTabela, tamanhoDados, dados, writer, "Divisao", HashFunctions::hashDivisao);
                     testarTabela(tamanhoTabela, tamanhoDados, dados, writer, "Multiplicacao", HashFunctions::hashMultiplicacao);
                     testarTabela(tamanhoTabela, tamanhoDados, dados, writer, "Dobramento", HashFunctions::hashDobramento);
-                }
-            }
 
-        } catch (IOException e) {
-            e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("CSV salvo: " + nomeArquivo);
+            }
         }
     }
 
